@@ -15,9 +15,7 @@ import Typography from "@material-ui/core/Typography";
 import useStyles from "../config/theme-signinup";
 import Copyright from "../components/Copyright";
 
-import PasswordForget from "../components/PasswordForget";
-
-function SignIn(props) {
+function SignUp(props) {
   const classes = useStyles();
   const initialUser = {
     id: null,
@@ -34,11 +32,12 @@ function SignIn(props) {
     setUser({ ...user, [name]: value });
   };
 
-  const handleSubmit = () => {
-    props.firebase
-      .doSignInWithEmailAndPassword(user.email, user.password)
+  const handleSubmit = (e) => {
+    props.firebase.auth
+      .createUserWithEmailAndPassword(user.email, user.password)
+      // Later add user also to database
       .then((authUser) => {
-        setUser({ initialUser });
+        setUser(initialUser);
         props.history.push("/dashboard");
       })
       .catch((error) => {
@@ -46,7 +45,7 @@ function SignIn(props) {
       });
   };
 
-  const isValid = user.email === "" || user.password === "";
+  const isValid = user.name === "" || user.email === "" || user.password === "";
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -58,13 +57,25 @@ function SignIn(props) {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign Up
           </Typography>
           <form
             className={classes.form}
             noValidate
             onSubmit={(e) => e.preventDefault()}
           >
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="Name"
+              name="name"
+              autoFocus
+              value={user.name}
+              onChange={handleChange}
+            />
             <TextField
               variant="outlined"
               margin="normal"
@@ -101,14 +112,11 @@ function SignIn(props) {
               onClick={handleSubmit}
               disabled={isValid}
             >
-              Sign In
+              Sign Up
             </Button>
             <Grid container>
-              <Grid item xs>
-                <PasswordForget />
-              </Grid>
               <Grid item>
-                <Link to="/sign-up">Don't have an account? Sign Up</Link>
+                <Link to="/">{"Already have an account? Sign In"}</Link>
               </Grid>
             </Grid>
             <Box mt={5}>
@@ -121,4 +129,4 @@ function SignIn(props) {
   );
 }
 
-export default withRouter(withFirebase(SignIn));
+export default withRouter(withFirebase(SignUp));
